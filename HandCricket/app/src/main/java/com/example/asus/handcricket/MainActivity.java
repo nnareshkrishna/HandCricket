@@ -2,7 +2,9 @@ package com.example.asus.handcricket;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -22,6 +24,11 @@ public class MainActivity extends Activity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         //setSupportActionBar(toolbar);
 
+        SharedPreferences mPreferences = PreferenceManager.getDefaultSharedPreferences(this) ;
+        SharedPreferences.Editor mEditor = mPreferences.edit() ;
+        mEditor.putInt("Matches",0) ;
+        mEditor.putInt("Wins",0) ;
+        mEditor.putInt("Losses",0) ;
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -1,8 +1,12 @@
 package com.example.asus.handcricket;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.SystemClock;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -10,7 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Random;
-import java.util.Timer;
+
 
 /**
  * Created by ASUS on 17-01-2017.
@@ -110,25 +114,103 @@ public class PlayArena extends Activity {
             }
             current_score += cScore ;
             if(current_score >= target){
-                Toast.makeText(this,"CPU Won",Toast.LENGTH_SHORT).show();
+                SharedPreferences mPreference = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE) ;
+                Integer matc = mPreference.getInt("Matches",0) ;
+                Integer won = mPreference.getInt("Won",0) ;
+                Integer los = mPreference.getInt("Loss",0) ;
+                //Toast.makeText(this,"CPU Won",Toast.LENGTH_SHORT).show();
+                matc+=1 ;
+                los +=1 ;
+                new AlertDialog.Builder(this)
+                        .setTitle("CPU Won")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                disableAll() ;
+                            }
+                        }).show() ;
+                writeValues(matc,won,los);
+                disableAll();
             }
             txtView4.setText("Score:"+current_score);
         }
     }
     public void computerOut(){
+        SharedPreferences mPreference = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE) ;
+        Integer matc = mPreference.getInt("Matches",0) ;
+        Integer won = mPreference.getInt("Won",0) ;
+        Log.d("WON",won+"") ;
+        Log.d("Match",matc+"") ;
+        Integer los = mPreference.getInt("Loss",0) ;
         if(current_score < target-1){
-            Toast.makeText(this,"You Won!!",Toast.LENGTH_SHORT).show();
+            matc +=1 ;
+            won +=1 ;
+            new AlertDialog.Builder(this)
+                    .setTitle("You Won")
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            disableAll() ;
+                        }
+                    }).show() ;
+            //Toast.makeText(this,"You Won!!",Toast.LENGTH_SHORT).show();
         }
         else if(current_score == target-1){
-            Toast.makeText(this,"Match ended in a draw",Toast.LENGTH_SHORT).show();
+            matc +=1 ;
+            new AlertDialog.Builder(this)
+                    .setTitle("Match ended in a draw")
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            disableAll() ;
+                        }
+                    }).show() ;
+            //Toast.makeText(this,"Match ended in a draw",Toast.LENGTH_SHORT).show();
         }
         else {
-            Toast.makeText(this,"CPU Won",Toast.LENGTH_SHORT).show();
+            matc+=1 ;
+            los +=1 ;
+            new AlertDialog.Builder(this)
+                    .setTitle("CPU Won")
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            disableAll() ;
+                        }
+                    }).show() ;
+
+            //Toast.makeText(this,"CPU Won",Toast.LENGTH_SHORT).show();
         }
+        writeValues(matc,won,los) ;
+    }
+    public void disableAll(){
+        btn1.setEnabled(false);
+        btn2.setEnabled(false);
+        btn3.setEnabled(false);
+        btn4.setEnabled(false);
+        btn5.setEnabled(false);
+        btn6.setEnabled(false);
+    }
+    public void writeValues(Integer matches,Integer won,Integer loss){
+        SharedPreferences mPreference = getSharedPreferences("MyPrefs",Context.MODE_PRIVATE);
+        SharedPreferences.Editor mEditor = mPreference.edit() ;
+        mEditor.putInt("Matches",matches) ;
+        mEditor.putInt("Won",won) ;
+        mEditor.putInt("Loss",loss) ;
+        mEditor.commit() ;
+        Log.d("Overall",matches+" "+won+" "+loss) ;
     }
     public void userOut(){
-        Toast.makeText(this,"You got out",Toast.LENGTH_LONG).show();
-        SystemClock.sleep(500);
+        new AlertDialog.Builder(this)
+                .setTitle("You got out")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                }).show();
+        //Toast.makeText(this,"You got out",Toast.LENGTH_LONG).show();
+        //SystemClock.sleep(500);
         target = current_score + 1 ;
         //current_score+=1 ;
         txtView9.setText("Target:"+current_score.toString());
@@ -138,8 +220,9 @@ public class PlayArena extends Activity {
         txtView8.setText("");
         //total_score = current_score ;
         current_score = 0 ;
-        txtView4.setText("Score:"+current_score);
+        txtView4.setText("Score:0");
         isUser = false ;
+        current_score = 0 ;
 
     }
 }
